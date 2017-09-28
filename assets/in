@@ -22,6 +22,8 @@ nonce=$(jq -r '.source.nonce // "vault-concourse-nonce"' < $payload)
 # Used for AWS EC2 authentication
 role_id=$(jq -r '.source.role_id // ""' < $payload)
 secret_id=$(jq -r '.source.secret_id // ""' < $payload)
+# Used for GitHub authentication
+github_access_token=$(jq -r '.source.github_access_token // ""' < $payload)
 
 echo "INFO: Reading secrets from: ${paths[*]}"
 
@@ -33,6 +35,8 @@ fi
 
 if [ "${auth_method}" = "AppRole" ]; then
     login_approle ${role_id} ${secret_id}
+elif [ "${auth_method}" = "GitHub" ]; then
+    login_github ${github_access_token}
 else
     login_aws_ec2 ${role} ${nonce}
 fi
